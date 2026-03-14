@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+
+  <title>Frontend Mentor | Product list with cart</title>
+
+
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <main>
+    <div class="product-list" id="product-list"> </div>
+
+    <div class="cart-sidebar">
+      <div class="cart-header">
+        <h2 id="cart-count">Your Cart (0)</h2>
+      </div>
+
+      <div id="cart-items"></div>
+
+
+  </main>
+  <div class="modal-overlay" style="display:none;"> <!-- 遮罩 -->
+    <div class="modal-card"> <!-- 白色弹窗 -->
+
+      <img src="./assets/images/icon-order-confirmed.svg" alt="right-icon">
+      <h3>Order Confirmed</h3>
+      <p>We hope you enjoy your food!</p>
+      <div class="modal-list"></div>
+      <button class="reset-btn">Start New Order</button>
+
+    </div>
+  </div>
+
+</body>
+<script src="index.js"></script>
+
+</html>

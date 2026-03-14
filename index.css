@@ -1,0 +1,488 @@
+ /* 全局初始化：干掉所有浏览器默认边距 */
+ * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+
+ }
+
+
+ /* 2. 全局变量（设计规范颜色） */
+ /* 把颜色存起来，以后直接用！就像给颜色起个外号。
+为什么用？
+不用每次都写一大串 hsl(...)
+想改红色，只改这一处，全站自动同步 */
+ :root {
+     --red: hsl(14, 86%, 42%);
+     --green: hsl(159, 69%, 38%);
+     --rose-50: hsl(20, 50%, 98%);
+     --rose-100: hsl(13, 31%, 94%);
+     --rose-300: hsl(14, 25%, 72%);
+     --rose-500: hsl(12, 20%, 44%);
+     --rose-900: hsl(14, 65%, 9%);
+ }
+
+ /* 全屏背景、全局样式 */
+ body {
+     font-family: "Red Hat Text", sans-serif;
+     background-color: var(--rose-100);
+     /* 桌面最大宽度 */
+     max-width: 1440px;
+     /* 4 个值  margin: 上 右 下 左;
+    3 个值  margin: 上 左右 下;*/
+     margin: 0 auto;
+     padding: 2rem;
+     /* 增加一点内边距，不要贴边 */
+ }
+
+ /* 中间内容区域 */
+ main {
+     /* 让里面的盒子 横着排（左右布局）变成弹性盒子 */
+     display: flex;
+     /* 两个元素之间的距离！不用写 margin自动给父子之间、兄弟之间加空隙
+    2rem = 两倍字体大小（固定比例，适配所有屏幕） */
+     gap: 2rem;
+     /* 垂直方向对齐方式：顶部对齐！
+    flex-start → 靠上
+    center → 居中
+    flex-end → 靠下 */
+     align-items: flex-start;
+ }
+
+ .product-list {
+     /* 谁写了 flex:1，谁就拼命占满父盒子剩下的所有空间！ */
+     flex: 1;
+     /* 网格布局 = 自动排版多行多列神器！
+     比 flex 更适合：
+    商品列表
+    图片墙
+    卡片布局
+     想一排显示多个卡片 → 用 grid！ */
+     display: grid;
+     /* 一行分 3 列，每列宽度自动平分！
+     拆开讲：
+    repeat(3, 1fr)
+    3 = 一排 3 个
+    1fr = 按比例分空间
+    1fr 是什么？
+    fr = 剩余空间比例单位
+    1fr 1fr 1fr → 三等分
+    2fr 1fr 1fr → 4 份，第一个占 2，后面各占 1 */
+     grid-template-columns: repeat(3, 1fr);
+     gap: 1.5rem;
+     /* 卡片之间加间距，给容器里的子元素之间加 “统一的间距” */
+
+ }
+
+
+ @media (max-width: 900px) {
+     main {
+         /* 纵向布局，商品列表会在上，侧边栏会在下 */
+         flex-direction: column;
+     }
+
+     .product-list {
+         /*一行 1 个 grid-template-columns: repeat(1, 1fr);也行*/
+         grid-template-columns: repeat(2, 1fr);
+     }
+ }
+
+ @media (max-width: 375px) {
+     .product-list {
+         /*一行 1 个 grid-template-columns: repeat(1, 1fr);也行*/
+         grid-template-columns: 1fr;
+     }
+ }
+
+
+
+ .cart-sidebar {
+     width: 300px;
+     background: white;
+     border-radius: 12px;
+     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+ }
+
+
+
+
+
+ /* 因为商品卡片是通过 JS 动态生成的，
+所以 CSS 选择器只需要匹配你 JS 里给元素加的 class 名称就行，
+不用管它是不是动态生成的 —— 浏览器渲染后，
+动态元素和静态元素的 CSS 选择器用法完全一样。 */
+
+ .product-card {
+     /*父相子绝*/
+     --img-height: 300px;
+     /* 图片高度变量 */
+     border-radius: 12px;
+     /* 卡片整体圆角 */
+     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+     /* 重点1：去掉卡片上下内边距，只保留左右内边距 */
+     padding: 0 1rem 6rem 1rem;
+     /* 上：0，右：1rem，下：1rem，左：1rem */
+     margin-bottom: 1.5rem;
+     overflow: hidden;
+     /* 重点2：防止图片圆角超出卡片 */
+     display: flex;
+     /* 先变成flex容器 */
+     flex-direction: column;
+     /* 子元素上下排列（垂直方向） */
+     align-items: center;
+     /* 交叉轴（水平）居中 → 所有子元素水平居中 */
+
+ }
+
+ /* 选中 .product-card 里面第一个孩子，并且这个孩子是 img 标签（也就是商品主图）。
+为什么不用直接写 .product-card img？
+因为卡片里还有按钮里的小图标（比如购物车图标）也是 img，用 :first-child 能精准选中 “商品主图”，不会误改按钮里的小图标～ */
+ .product-card img:first-child {
+     /*宽高比4：3*/
+     aspect-ratio: 4/3;
+     width: 100%;
+     /* height: 180px; */
+     object-fit: cover;
+     /* 裁剪图片，只显示核心区域，不拉伸 */
+     border-radius: 12px;
+     margin-bottom: -2rem;
+ }
+
+ /* 选中所有 Add to Cart 按钮（基础样式） */
+ .add-to-cart-btn {
+     display: flex;
+     align-items: center;
+     /*垂直居中 */
+     justify-content: center;
+     /*  水平居中 */
+     gap: 0.5rem;
+     background-color: var(--rose-50);
+     color: var(--red);
+     border: 1px solid var(--red);
+     border-radius: 30px;
+     padding: 0.75rem;
+     width: 60%;
+     font-weight: 600;
+     cursor: pointer;
+     /* 鼠标移上去变手型 */
+     z-index: 10;
+     /* 新增：保证按钮在图片上方 */
+
+     max-width: 200px;
+     box-sizing: border-box; /* 强制内边距算在宽高里，不溢出 */
+ }
+  .quantity-controls{
+    display: flex;
+     align-items: center;
+     /*垂直居中 */
+     justify-content: space-between;
+     /*  水平居中 */
+     gap: 0.5rem;
+     border-radius: 30px;
+     width: 60%;
+     font-weight: 600;
+     cursor: pointer;
+     /* 鼠标移上去变手型 */
+     z-index: 10;
+     /* 新增：保证按钮在图片上方 */
+     max-width: 200px;
+    background-color: var(--red);
+    padding: 0.5rem ; /* 给内部足够空间 */
+    min-height: 40px;
+    
+box-sizing: border-box; /* 强制内边距算在宽高里，不溢出 */
+  }
+ .quantity-controls button {
+  width: 23px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 让按钮背景 变成透明 */
+  background: transparent;
+ 
+  border: 1px solid white;
+  border-radius: 50px;
+ 
+   /* 关键：让按钮不被挤压 */
+  flex-shrink: 0;
+   /* 新增：确保按钮内容完全居中 */
+    line-height: 1;
+}
+.quantity-controls span{
+
+  color: white;
+}
+.quantity-controls button.minus img,
+.quantity-controls button.plus img  {
+   width: 10px!important; 
+  height: 10px; 
+/*  让图片乖乖待在盒子里，不变形、不溢出！
+ 图片太大 → 自动缩小
+图片比例不对 → 保持原样，不拉伸
+永远不会跑出去！ */
+  object-fit: contain;
+  display: block;
+  /* 新增：确保图片在按钮内完全居中 */
+    margin: auto;
+    
+
+}
+
+ /* 1. 空购物车的插图（效果图里很小） */
+ /* 通过 alt 属性筛选（推荐，语义化） */
+ .add-to-cart-btn img[alt="cart-icon"] {
+     width: 16px;
+     height: 16px;
+     flex-shrink: 0;
+     /* 图标不被挤压变形 */
+     margin: 0 auto;
+ }
+
+
+ 
+ .cart-sidebar {
+ min-height: 300px;
+ min-width: 360px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+
+ }
+.cart-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: var(--red);
+}
+/*商品名字 + 价格那一行*/
+.cart-item-price-wrap{
+    display: flex;
+    align-items: center;
+    gap:1rem;
+}
+
+ .cart-item {
+        display: flex;
+        /* 左右分开！左边商品信息，右边删除按钮 */
+    justify-content: space-between;
+    /* 上下居中 */
+  align-items: center;
+  /* 每个商品上下留空隙，不拥挤 */
+  padding: 12px 0;
+    
+ }
+ .quantity{
+    color:var( --red);
+    font-weight: bold;
+ }
+.price-single{
+color:var( --rose-300);
+}
+.price-total{
+color:var( --rose-500);
+}
+
+
+ .tree {
+    display: flex;
+     background-color: var(--rose-100);
+     border-radius: 10px;
+     white-space: nowrap;
+     padding: 10px 12px;
+      align-items: center;   /* 让图标和文字垂直居中 */
+  justify-content: center; /* 让整行在容器里水平居中 */
+  white-space: nowrap;  /* 强制不换行 */
+  overflow: hidden;     /* 不让内容跑出容器 */
+  max-width: 100%;
+  gap:5px;
+ }
+
+ /* 右边删除按钮 */
+ .cart-item-remove {
+  background: none;
+    border: 3px solid var(--rose-100); /* 加个边框，让 × 更清晰 */
+  border-radius: 60%; /* 让按钮变成圆形，包裹 × */
+  cursor: pointer;
+  flex-shrink: 0; /* 不让按钮被压缩变形 */
+}
+.cart-item-remove img {
+  width: 14px;
+  height: 14px;
+}
+/*分割线*/
+.cart-divider {
+  height: 1px;
+  background-color: var(--rose-100);
+  margin: 8px 0;
+}
+/* 按钮默认不是块级，所以 margin:auto 不生效
+加 display:block → 按钮独占一行
+margin:0 auto → 左右自动平分空间 → 居中 */
+.orderbtn{
+    width: 80%;
+    border: none;
+    color:white;
+    background-color:var(--red);
+    border-radius: 30px;
+    font-size: 16px;
+    margin: 20px auto 0; /* 上20px，下0 左右自动居中 */
+     display: block;      /* 👈 让按钮变成独占一行的块级元素 */
+     padding: 14px 0;     /* 让按钮变高，更好看 */
+}
+.cart-total{
+    /* justify-* 和 align-* 必须在 flex容器里才有效 */
+    justify-content: space-between;
+    display: flex; /* 必须加！开启 flex 布局 */
+  justify-content: space-between; /* 左右分开 */
+  align-items: center; /* 上下居中 */
+}
+#cart-total{
+    font-weight: 700 !important; /* 必须加 !important */
+
+}
+
+
+.empty-cart{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap:1rem;
+}
+
+
+
+/* 1. 全屏遮罩 → 盖住整个页面 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* 2. 白色弹窗 → 真正的内容框 */
+.modal-card {
+  background: white;
+  width: 90%;
+  max-width: 460px;
+  padding: 30px;
+  border-radius: 12px;
+  /* 新增下面两行，实现滚动 */
+  max-height: 700px; /* 限制最大高度，超过就滚动 */
+  overflow-y: auto; /*   垂直方向自动显示滚动条 */
+}
+.modal-card::-webkit-scrollbar {
+  width: 8px; /* 稍微加宽一点，圆角更明显 */
+}
+
+.modal-card::-webkit-scrollbar-track {
+  background: transparent; /* 轨道透明，不影响背景 */
+  border-radius: 8px;      /* 轨道也圆角 */
+}
+
+.modal-card::-webkit-scrollbar-thumb {
+  background: #f5f5db;
+  border-radius: 8px; /* 圆角值和轨道一致 */
+  min-height: 8px;   /* 保证滑块有足够高度显示圆角 */
+}
+
+
+.modal-list{
+background: var(--rose-100);
+border-radius: 12px;
+padding:8px ;
+}
+/* 3. 图片样式 */
+.modal-card img {
+  width: 40px;
+  margin-bottom: 10px;
+}
+
+/* 4. 标题 */
+.modal-card h3 {
+  font-weight: 700;
+  font-size: 30px;
+  margin: 0 0 5px;
+}
+
+/* 5. 说明文字 */
+.modal-card p {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 20px;
+}
+
+/* 6. 按钮 */
+.reset-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--red);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+
+.modal-item {
+  border-radius: 12px;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 8px;
+}
+.modal-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.modal-item-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+.modal-except-img h4 {
+  margin: 0;
+  font-size: 16px;
+}
+.modal-item-info {
+  color: #666;
+  font-size: 14px;
+  gap:1rem;
+}
+.modal-total-row {
+  display: flex;
+  justify-content: space-between;
+  /* border-top: 1px solid #ddd; */
+  padding-top: 12px;
+  margin-top: 10px;
+}
+/* background-color = 给 盒子 上色
+你这个分割线 根本没有文字，就是一个扁盒子！所以必须用 背景色！
+文字颜色 → color
+盒子颜色 → background /background-color */
+.form-divider{
+height: 1px;
+  background-color: #e8ded6; /* 浅米色分割线，和设计图一致 */
+  margin: 10px 0; /* 上下留白，让分割线不贴商品 */
+}
+.quantity-form{
+  color:var(--red);
+  margin-right: 8px; /* 这里控制间距 */
+}
+.modal-total-value{
+  font-weight: bold;
+  font-size: 25px;
+  
+}
